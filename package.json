@@ -7,10 +7,10 @@
   "release": "16f1",
   "author": {
     "name": "ThunderKit",
-    "url": "https://github.com/PassivePicasso/BundleKit"
+    "url": "https://github.com/KevinfromHP/AddressableImports"
   },
   "dependencies": {
-    "com.unity.scriptablebuildpipeline": "1.19.3",
-	"com.unity.addressables": "1.18.5",
+	"com.passivepicasso.thunderkit": "https://github.com/PassivePicasso/ThunderKit.git",
+	"com.unity.addressables": "1.18.5"
   }
 }
