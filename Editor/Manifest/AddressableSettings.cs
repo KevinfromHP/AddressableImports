@@ -1,7 +1,8 @@
 ﻿using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
+using ThunderKit.Core.Manifests;
 
-namespace ThunderKit.Core.Manifests.Datum
+namespace ThunderKit.Addressable.Manifest
 {
     //TODO: Documentation
     public class AddressableSettings : ManifestDatum

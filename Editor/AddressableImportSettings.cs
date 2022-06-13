@@ -14,7 +14,7 @@ using UnityEditor.AddressableAssets.Build;
 using UnityEditor.AddressableAssets.Build.DataBuilders;
 using UnityEditor.AddressableAssets;
 
-namespace ThunderKit.Addressable.AddressableImports
+namespace ThunderKit.Addressable
 {
 
     public class AddressableImportSettings : ThunderKitSetting

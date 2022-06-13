@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 
-namespace ThunderKit.Addressable.AddressableImports
+namespace ThunderKit.Addressable
 {
     public static class AddressableHelper
     {
