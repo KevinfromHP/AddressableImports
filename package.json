@@ -9,6 +9,6 @@
     "url": "https://github.com/KevinfromHP/AddressableImports"
   },
   "dependencies": {
-    "com.unity.addressables": "1.18.5"
+    "com.unity.addressables": "1.18.15"
   }
 }
