@@ -2,7 +2,6 @@
   "name": "com.passivepicasso.addressableimports",
   "version": "0.0.1",
   "displayName": "Addressable Imports",
-  "description": "",
   "unity": "2018.4",
   "release": "16f1",
   "author": {
@@ -10,7 +9,6 @@
     "url": "https://github.com/KevinfromHP/AddressableImports"
   },
   "dependencies": {
-	"com.passivepicasso.thunderkit": "https://github.com/PassivePicasso/ThunderKit.git",
-	"com.unity.addressables": "1.18.5"
+    "com.unity.addressables": "1.18.5"
   }
 }
