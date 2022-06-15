@@ -1,6 +1,7 @@
-﻿using UnityEditor.AddressableAssets.Settings;
+﻿using ThunderKit.Core.Manifests;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
-using ThunderKit.Core.Manifests;
 
 namespace ThunderKit.Addressable.Manifest
 {

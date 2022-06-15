@@ -14,6 +14,11 @@ namespace ThunderKit.Addressable
             return File.Exists(Path.Combine(Application.dataPath, SettingsPath));
         }
 
+        public static bool CatalogExists(string catalogName = "catalog")
+        {
+            return File.Exists(Path.Combine(Application.dataPath, Addressables.RuntimePath, $"{catalogName}.json"));
+        }
+
         //public static string[] GetCatalogsFromSettings(string settingsPath)
         //{
             
