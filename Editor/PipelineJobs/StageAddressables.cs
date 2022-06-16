@@ -56,7 +56,6 @@ namespace ThunderKit.Addressable.PipelineJobs
                     pipeline.Log(LogLevel.Warning, $"No AddressableSettings found on manifest {pipeline.manifest.name}, skipping.");
                     return Task.CompletedTask;
                 }
-
                 string catName = !string.IsNullOrEmpty(catalogName) ? PathReference.ResolvePath(catalogName, pipeline, this).Replace(" ", "") : "catalog";
                 string id = PathReference.ResolvePath(catalogID, pipeline, this).Replace(" ", "");
                 string catalogLoadDir = PathReference.ResolvePath(localCatalogLoadDirectory, pipeline, this);
@@ -68,7 +67,6 @@ namespace ThunderKit.Addressable.PipelineJobs
                 };
 
                 ModdedBuildScriptBase buildScript;
-
                 //TODO: Verify whether the assets have changed for faster building.
                 //if(AddressableHelper.SettingsExist())
                 //{
