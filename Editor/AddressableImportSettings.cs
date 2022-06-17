@@ -1,18 +1,46 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using ThunderKit.Core.Data;
 using UnityEditor;
+using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Build;
+using UnityEditor.AddressableAssets.Build.DataBuilders;
 using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
+using System.IO;
+using System;
+using System.IO;
+using System.Reflection;
 using System.Linq;
+using System.Text;
+using System.Collections;
 using ThunderKit.Core.Attributes;
-using UnityEditor.AddressableAssets.Build;
-using UnityEditor.AddressableAssets.Build.DataBuilders;
+using System.Threading.Tasks;
+using ThunderKit.Core.Data;
+using ThunderKit.Core.Manifests.Datum;
+using ThunderKit.Core.Paths;
+using ThunderKit.Core.Pipelines;
+using UnityEditor;
+using UnityEditor.Compilation;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEditor.AddressableAssets.Settings;
+using UnityEngine.AddressableAssets;
 using UnityEditor.AddressableAssets;
+using UnityEditor.AddressableAssets.Build.DataBuilders;
+using UnityEditor.AddressableAssets.Build;
+using ThunderKit.Addressable.Manifest;
+using ThunderKit.Addressable.Builders;
+using UnityEngine.AddressableAssets.Initialization;
+using UnityEngine.AddressableAssets.ResourceLocators;
+using ThunderKit.Common;
 
 namespace ThunderKit.Addressable
 {
@@ -21,32 +49,26 @@ namespace ThunderKit.Addressable
     {
         public static event EventHandler AddressablesInitialized;
 
+        public static List<IResourceLocator> GameResourceLocators;
+
         [InitializeOnLoadMethod]
         public static void OnLoad()
         {
-            Addressables.InternalIdTransformFunc = RedirectInternalIdsToGameDirectory;
+            InitializeAddressables();
             CompilationPipeline.compilationStarted -= ClearSelectionIfUnsavable;
             CompilationPipeline.compilationStarted += ClearSelectionIfUnsavable;
-            InitializeAddressables();
+            Addressables.InternalIdTransformFunc += RedirectInternalIdsToGameDirectory;
         }
 
         static string RedirectInternalIdsToGameDirectory(IResourceLocation location)
         {
-            var resourceLocator = Addressables.ResourceLocators.Where(locator => locator.Keys.Contains(location)).SingleOrDefault(); // this really shouldn't need the default
-            //Debug.Log(Addressables.ResourceLocators.Count());
-            switch (location.ResourceType)
+            if (location.ResourceType == typeof(IAssetBundleResource) && GameResourceLocators != null)
             {
-                case var t when t == typeof(IAssetBundleResource):
-                    var iid = location.InternalId;
-
-
-                    var path = iid.Substring(iid.IndexOf("/aa") + 4);
-                    path = Path.Combine(ThunderKitSettings.EditTimePath, path);
-                    return path;
-                default:
-                    var result = location.InternalId;
-                    return result;
+                var gameLocators = GameResourceLocators;
+                if (gameLocators.Any(gameLocator => gameLocator.Keys.Contains(location.PrimaryKey)))
+                    return AddressableHelper.RedirectInternalIDToGame(location.InternalId);
             }
+            return location.InternalId; ;
         }
 
         private static void ClearSelectionIfUnsavable(object obj)
@@ -62,28 +84,42 @@ namespace ThunderKit.Addressable
             rootElement.Add(new Button(InitializeAddressables) { text = "Reload" });
         }
 
+        //[MenuItem("Tools/Initialize Addressables")]
         static void InitializeAddressables()
         {
-            //if (!AddressableHelper.SettingsExist())
-            //{
-            //    Debug.LogWarning("settings.json file not found. Generating...");
-            //    var db = ScriptableObject.CreateInstance<BuildScriptFastMode>();
-            //    db.BuildData<AddressableAssetBuildResult>(new AddressablesDataBuilderInput(AddressableAssetSettingsDefaultObject.Settings));
-            //}
+            if (!AddressableHelper.SettingsExist())
+            {
+                Debug.LogWarning("settings.json file not found. Generating...");
+                var buildScript = new ModdedBuildScriptPackedMode("catalog", "ModdedCatalogContent", "{UnityEngine.AddressableAssets.Addressables.RuntimePath}", null);
+                buildScript.BuildData<AddressableAssetBuildResult>(new AddressablesDataBuilderInput(AddressableAssetSettingsDefaultObject.Settings));
+            }
 
-            //var ao = Addressables.InitializeAsync();
-            //ao.WaitForCompletion();
+            //I hate that I have to do this. It'll try to generate in a way it can't if I don't set the runtimepath. It tries to use the GUID of the default settings object and fast generate,
+            //but it needs to stay as it is or Unity will freeze. It doesn't seem there's much I can really do about this.
+            PlayerPrefs.SetString(Addressables.kAddressablesRuntimeDataPath, Addressables.RuntimePath + "/settings.json");
 
-            ImportAdditionalCatalogs();
+            var ao = Addressables.InitializeAsync();
+            ao.WaitForCompletion();
 
-            //AddressablesInitialized?.Invoke(null, EventArgs.Empty);
-            
+            ImportAdditionalCatalogLocations();
+
+            AddressablesInitialized?.Invoke(null, EventArgs.Empty);
         }
-        private static void ImportAdditionalCatalogs()
+
+        private static void ImportAdditionalCatalogLocations()
         {
-            //var gameRuntimeDataLocation = new ResourceLocationBase("GameRuntimeData", ThunderKitSettings.EditTimePath, typeof(JsonAssetProvider).FullName, typeof(UnityEngine.AddressableAssets.Initialization.ResourceManagerRuntimeData));
-            //Addressables.LoadResourceLocationsAsync
-        }
+            var tkSettings = GetOrCreateSettings<ThunderKitSettings>();
 
+            var resourceLocators = new List<IResourceLocator>();
+            foreach (var catalogLocation in JsonUtility.FromJson<ResourceManagerRuntimeData>(File.ReadAllText(tkSettings.AddressableAssetsSettings)).CatalogLocations)
+            {
+                var iid = Addressables.ResolveInternalId(catalogLocation.InternalId.Replace("{UnityEngine.AddressableAssets.Addressables.RuntimePath}", "{ThunderKit.Core.Data.ThunderKitSettings.EditTimePath}"));
+                //This needs testing with remote catalogs, but that's annoying to set up.
+                var ao = Addressables.LoadContentCatalogAsync(iid);
+                var locator = ao.WaitForCompletion();
+                resourceLocators.Add(locator);
+            }
+            GameResourceLocators = resourceLocators;
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using UnityEngine;
+using ThunderKit.Core.Data;
 using UnityEngine.AddressableAssets;
-
+using UnityEngine;
 
 namespace ThunderKit.Addressable
 {
@@ -19,9 +19,10 @@ namespace ThunderKit.Addressable
             return File.Exists(Path.Combine(Directory.GetCurrentDirectory(), Addressables.RuntimePath, $"{catalogName}.json"));
         }
 
-        //public static string[] GetCatalogsFromSettings(string settingsPath)
-        //{
-            
-        //}
+        public static string RedirectInternalIDToGame(string internalId)
+        {
+            var resolvedId = internalId.Replace(Addressables.RuntimePath, Application.streamingAssetsPath + "/aa");
+            return Path.Combine(ThunderKitSettings.EditTimePath, resolvedId.Substring(resolvedId.IndexOf("/aa") + 4));
+        }
     }
 }
