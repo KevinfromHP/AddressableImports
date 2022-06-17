@@ -93,9 +93,6 @@ namespace ThunderKit.Addressable
                 var buildScript = new ModdedBuildScriptPackedMode("catalog", "ModdedCatalogContent", "{UnityEngine.AddressableAssets.Addressables.RuntimePath}", null);
                 buildScript.BuildData<AddressableAssetBuildResult>(new AddressablesDataBuilderInput(AddressableAssetSettingsDefaultObject.Settings));
             }
-
-            //I hate that I have to do this. It'll try to generate in a way it can't if I don't set the runtimepath. It tries to use the GUID of the default settings object and fast generate,
-            //but it needs to stay as it is or Unity will freeze. It doesn't seem there's much I can really do about this.
             PlayerPrefs.SetString(Addressables.kAddressablesRuntimeDataPath, Addressables.RuntimePath + "/settings.json");
 
             var ao = Addressables.InitializeAsync();
