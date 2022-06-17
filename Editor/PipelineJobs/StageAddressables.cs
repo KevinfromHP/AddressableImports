@@ -36,9 +36,10 @@ namespace ThunderKit.Addressable.PipelineJobs
         [PathReferenceResolver]
         public string catalogName = "<ManifestName>Catalog";
 
+        [HideInInspector]
         [Tooltip("The key of the catalog, used for loading the bundle from the settings.json file. Path Reference compatible. Cannot be named \"AddressablesMainContentCatalog\".")]
         [PathReferenceResolver]
-        public string catalogID = "Addressables<ManifestName>CatalogContent";
+        public string catalogID = "AddressablesMainContentCatalog";
 
         [Tooltip("Uses Addressables Path resolving. Use it to point to a static string property within your mod's assembly. It should point to the directory of your catalog (not the path). This should not be left as the default.")]
         [PathReferenceResolver]

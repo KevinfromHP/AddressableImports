@@ -64,7 +64,7 @@ namespace ThunderKit.Addressable
             if (!AddressableHelper.SettingsExist())
             {
                 Debug.LogWarning("settings.json file not found. Generating...");
-                var buildScript = new ModdedBuildScriptPackedMode("catalog", "ModdedCatalogContent", "{UnityEngine.AddressableAssets.Addressables.RuntimePath}", null);
+                var buildScript = new ModdedBuildScriptPackedMode("catalog", "AddressablesMainContentCatalog", "{UnityEngine.AddressableAssets.Addressables.RuntimePath}", null);
                 buildScript.BuildData<AddressableAssetBuildResult>(new AddressablesDataBuilderInput(AddressableAssetSettingsDefaultObject.Settings));
             }
             PlayerPrefs.SetString(Addressables.kAddressablesRuntimeDataPath, Addressables.RuntimePath + "/settings.json");
@@ -85,7 +85,7 @@ namespace ThunderKit.Addressable
             foreach (var catalogLocation in JsonUtility.FromJson<ResourceManagerRuntimeData>(File.ReadAllText(tkSettings.AddressableAssetsSettings)).CatalogLocations)
             {
                 var iid = Addressables.ResolveInternalId(catalogLocation.InternalId.Replace("{UnityEngine.AddressableAssets.Addressables.RuntimePath}", "{ThunderKit.Core.Data.ThunderKitSettings.EditTimePath}"));
-                //This needs testing with remote catalogs, but that's annoying to set up.
+                //This needs testing with remote catalogs.
                 var ao = Addressables.LoadContentCatalogAsync(iid);
                 var locator = ao.WaitForCompletion();
                 resourceLocators.Add(locator);
